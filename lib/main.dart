@@ -6,7 +6,7 @@ import 'package:formz/formz.dart';
 void main() => runApp(const App());
 
 class App extends StatelessWidget {
-  const App({super.key});
+  const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,39 +22,8 @@ class App extends StatelessWidget {
   }
 }
 
-class MyForm extends StatefulWidget {
-  const MyForm({super.key});
-
-  @override
-  State<MyForm> createState() => _MyFormState();
-}
-
-class _MyFormState extends State<MyForm> {
-  final _emailFocusNode = FocusNode();
-  final _passwordFocusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _emailFocusNode.addListener(() {
-      if (!_emailFocusNode.hasFocus) {
-        context.read<MyFormBloc>().add(EmailUnfocused());
-        FocusScope.of(context).requestFocus(_passwordFocusNode);
-      }
-    });
-    _passwordFocusNode.addListener(() {
-      if (!_passwordFocusNode.hasFocus) {
-        context.read<MyFormBloc>().add(PasswordUnfocused());
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    super.dispose();
-  }
+class MyForm extends StatelessWidget {
+  const MyForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +48,8 @@ class _MyFormState extends State<MyForm> {
         padding: const EdgeInsets.all(8),
         child: Column(
           children: <Widget>[
-            EmailInput(focusNode: _emailFocusNode),
-            PasswordInput(focusNode: _passwordFocusNode),
+            EmailInput(),
+            PasswordInput(),
             const SubmitButton(),
           ],
         ),
@@ -90,17 +59,12 @@ class _MyFormState extends State<MyForm> {
 }
 
 class EmailInput extends StatelessWidget {
-  const EmailInput({required this.focusNode, super.key});
-
-  final FocusNode focusNode;
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MyFormBloc, MyFormState>(
       builder: (context, state) {
         return TextFormField(
           initialValue: state.email.value,
-          focusNode: focusNode,
           decoration: InputDecoration(
             icon: const Icon(Icons.email),
             labelText: 'Email',
@@ -111,7 +75,7 @@ class EmailInput extends StatelessWidget {
           ),
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
-            context.read<MyFormBloc>().add(EmailChanged(email: value));
+            context.read<MyFormBloc>().emailChanged(value);
           },
           textInputAction: TextInputAction.next,
         );
@@ -121,17 +85,12 @@ class EmailInput extends StatelessWidget {
 }
 
 class PasswordInput extends StatelessWidget {
-  const PasswordInput({required this.focusNode, super.key});
-
-  final FocusNode focusNode;
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MyFormBloc, MyFormState>(
       builder: (context, state) {
         return TextFormField(
           initialValue: state.password.value,
-          focusNode: focusNode,
           decoration: InputDecoration(
             icon: const Icon(Icons.lock),
             helperText:
@@ -145,7 +104,7 @@ class PasswordInput extends StatelessWidget {
           ),
           obscureText: true,
           onChanged: (value) {
-            context.read<MyFormBloc>().add(PasswordChanged(password: value));
+            context.read<MyFormBloc>().passwordChanged(value);
           },
           textInputAction: TextInputAction.done,
         );
@@ -155,22 +114,21 @@ class PasswordInput extends StatelessWidget {
 }
 
 class SubmitButton extends StatelessWidget {
-  const SubmitButton({super.key});
+  const SubmitButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final isValid = context.select((MyFormBloc bloc) => bloc.state.isValid);
     return ElevatedButton(
-      onPressed: isValid
-          ? () => context.read<MyFormBloc>().add(FormSubmitted())
-          : null,
+      onPressed:
+          isValid ? () => context.read<MyFormBloc>().formSubmitted() : null,
       child: const Text('Submit'),
     );
   }
 }
 
 class SuccessDialog extends StatelessWidget {
-  const SuccessDialog({super.key});
+  const SuccessDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
 part of 'my_form_bloc.dart';
 
-final class MyFormState extends Equatable {
+class MyFormState extends Equatable {
   const MyFormState({
     this.email = const Email.pure(),
     this.password = const Password.pure(),
